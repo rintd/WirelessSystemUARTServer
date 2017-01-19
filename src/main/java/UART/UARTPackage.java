@@ -27,10 +27,15 @@
 
 package UART;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by Jiro on 18.01.17.
  */
 public class UARTPackage {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private static int RX_STAGE_WAIT_FOR_BEGIN = 0;
     private static int RX_STAGE_READ_HEADER    = 1;
     private static int RX_STAGE_READ_BODY      = 2;
@@ -79,7 +84,7 @@ public class UARTPackage {
                     }
                 }
 
-                sRX_headerData[sRX_headerDataSize++] = (char) value;
+                sRX_headerData[sRX_headerDataSize++] = value;
 
                 if (sRX_headerDataSize >= sRX_headerDataSize) {
                     //TODO: дописать обработку хедеров

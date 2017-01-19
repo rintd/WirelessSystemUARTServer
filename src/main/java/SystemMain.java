@@ -26,6 +26,8 @@
  */
 
 import jssc.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,6 +36,8 @@ import java.util.TimerTask;
  * Created by Jiro on 18.01.17.
  */
 public class SystemMain {
+
+    private static final Logger log = LoggerFactory.getLogger(SystemMain.class);
 
     private static SerialPort serialPort;
 
@@ -52,7 +56,7 @@ public class SystemMain {
                 serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
                 serialPort.addEventListener(new PortReader(), SerialPort.MASK_RXCHAR);
 
-                //                serialPort.writeString("Get data");
+                // serialPort.writeString("Get data");
                 final byte[] bytes = { (byte) 0xff, (byte) 1, (byte) 0x00, (byte) 0x00, (byte) 0x16, (byte) 0x00,
                         (byte) 0x0B, (byte) 0x00 };
 
@@ -67,11 +71,12 @@ public class SystemMain {
                             serialPort.writeBytes(bytes);
                         } catch (SerialPortException e) {
                             e.printStackTrace();
+                            log.error("SerialPortException in Timer#schedule", e);
                         }
                     }
                 }, 0, 1000);
-            } catch (SerialPortException ex) {
-                System.err.println(ex);
+            } catch (SerialPortException e) {
+                log.error("SerialPortException", e);
             }
         }
     }
@@ -86,8 +91,8 @@ public class SystemMain {
                     for (byte b : data) {
                         System.out.print(b);
                     }
-                } catch (SerialPortException ex) {
-                    System.err.println(ex);
+                } catch (SerialPortException e) {
+                    log.error("SerialPortException", e);
                 }
             }
         }
