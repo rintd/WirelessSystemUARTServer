@@ -67,6 +67,8 @@ public class JFxUIMain extends Application {
                 switch (event.getButton()) {
                     case PRIMARY: {
                         //TODO: сделать подключение
+                        ChoiceBox choiceBox = (ChoiceBox) scene.lookup("#uart_devices");
+//                        choiceBox.getSelectionModel().getSelectedIndex()
                     }
                     break;
 
