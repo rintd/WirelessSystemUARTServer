@@ -2,6 +2,7 @@ package FX; /**
  * Created by Jiro on 23.01.17.
  */
 
+import UART.UARTConnector;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
@@ -20,13 +21,16 @@ import java.util.Optional;
 
 public class JFxUIMain extends Application {
     public VBox vbox;
+    public UARTConnector uartConnector = null;
 
     public static void main(String[] args) {
         launch(args);
     }
 
+
     @Override
     public void start(Stage primaryStage) throws Exception {
+        uartConnector = new UARTConnector();
 
         vbox = FXMLLoader.load(getClass().getResource("../fxinterface.fxml"));
 
@@ -36,25 +40,15 @@ public class JFxUIMain extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-
-        Button resetButton = (Button) scene.lookup("#scan_button");
-
-        resetButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        ChoiceBox choiceBox = (ChoiceBox) scene.lookup("#uart_devices");
+        choiceBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                switch (event.getButton()) {
-                    case PRIMARY: {
-                        ChoiceBox choiceBox = (ChoiceBox) scene.lookup("#uart_devices");
-
-                        String[] portNames = SerialPortList.getPortNames();
+                if (event.getButton().equals(MouseButton.PRIMARY)){
+                    String[] portNames = SerialPortList.getPortNames();
+                    if(portNames.length>0){
                         choiceBox.setItems(FXCollections.observableArrayList(portNames));
                     }
-                    break;
-
-                    default: {
-
-                    }
-                    break;
                 }
             }
         });
@@ -66,9 +60,21 @@ public class JFxUIMain extends Application {
             public void handle(MouseEvent event) {
                 switch (event.getButton()) {
                     case PRIMARY: {
-                        //TODO: сделать подключение
-                        ChoiceBox choiceBox = (ChoiceBox) scene.lookup("#uart_devices");
-//                        choiceBox.getSelectionModel().getSelectedIndex()
+                        if(connectButton.getText().equals("connect")){
+                            ChoiceBox choiceBox = (ChoiceBox) scene.lookup("#uart_devices");
+                            String s = (String)choiceBox.getSelectionModel().getSelectedItem();
+
+                            uartConnector.Init(s);
+                            if(uartConnector.Connect()){
+                                choiceBox.setDisable(true);
+                                connectButton.setText("disconnect");
+                            }
+                        } else if(uartConnector.IsConnected()){
+                            if(uartConnector.Disconnect()){
+                                choiceBox.setDisable(false);
+                                connectButton.setText("connect");
+                            }
+                        }
                     }
                     break;
 
@@ -79,8 +85,6 @@ public class JFxUIMain extends Application {
                 }
             }
         });
-
-
 
         TabPane TabPanel = (TabPane)scene.lookup("#tab_panel");
 
@@ -99,7 +103,7 @@ public class JFxUIMain extends Application {
 //
 //        Optional<String> result = dialog.showAndWait();
 //        if (result.isPresent()){
-//            this.addNodeInList(result.get());
+//            this.addNodeInList(TabPanel, result.get());
 //        }
     }
 
