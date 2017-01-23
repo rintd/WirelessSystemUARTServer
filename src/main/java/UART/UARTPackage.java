@@ -48,7 +48,7 @@ public class UARTPackage {
     public int destAddress;
     public char type = 0x00;
     public  byte[]            data;
-    private UARTMessageHeader header;
+    private static UARTMessageHeader header;
 
     public static UARTPackage getPackegeFromBytes(byte[] bytes) {
 
@@ -88,7 +88,7 @@ public class UARTPackage {
 
                 if (sRX_headerDataSize >= sRX_headerDataSize) {
                     //TODO: дописать обработку хедеров
-                    if (header -> size > 0) {
+                    if (header.length > 0) {
                         uart_state = RX_STAGE_READ_BODY;
                         sRX_bodyDataSize = 0;
                     } else {
@@ -121,7 +121,7 @@ public class UARTPackage {
                 // UartMsgHeader_t header;
                 // memcpy(&header,sRX_headerData,sizeof(UartMsgHeader_t));
 
-                if (sRX_bodyDataSize >= header.size) {
+                if (sRX_bodyDataSize >= header.length) {
                     uart_state = RX_STAGE_WAIT_FOR_BEGIN;
                     sRX_headerDataSize = 0;
                     sRX_bodyDataSize = 0;
