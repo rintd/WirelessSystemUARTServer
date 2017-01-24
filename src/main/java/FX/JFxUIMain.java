@@ -3,12 +3,13 @@ package FX; /**
  */
 
 import UART.UARTConnector;
+import UART.UARTConnectorDelegate;
+import UART.UARTPackage;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -19,7 +20,7 @@ import jssc.SerialPortList;
 
 import java.util.Optional;
 
-public class JFxUIMain extends Application {
+public class JFxUIMain extends Application implements UARTConnectorDelegate {
     public VBox vbox;
     public UARTConnector uartConnector = null;
 
@@ -30,7 +31,7 @@ public class JFxUIMain extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        uartConnector = new UARTConnector();
+        uartConnector = new UARTConnector(this);
 
         vbox = FXMLLoader.load(getClass().getResource("../fxinterface.fxml"));
 
@@ -96,15 +97,6 @@ public class JFxUIMain extends Application {
         vBox.setAlignment(Pos.TOP_CENTER);
         nodesTab.setContent(vBox);
         TabPanel.getTabs().add(nodesTab);
-
-//        TextInputDialog dialog = new TextInputDialog("");
-//        dialog.setTitle("Node Address Configuration");
-//        dialog.setContentText("Please Enter Node Address less 65535");
-//
-//        Optional<String> result = dialog.showAndWait();
-//        if (result.isPresent()){
-//            this.addNodeInList(TabPanel, result.get());
-//        }
     }
 
     public void addNodeInList (TabPane tabPanel,String nodeName) {
@@ -126,4 +118,28 @@ public class JFxUIMain extends Application {
         });
         fstVBox.getChildren().add(label);
     }
+
+    @Override
+    public void OnConnectionClosed() {
+
+    }
+
+    @Override
+    public void OnConnectionOpened() {
+
+    }
+
+    @Override
+    public void OnConnectionDidRecivePackege(UARTPackage packege) {
+
+    }
 }
+
+//        TextInputDialog dialog = new TextInputDialog("");
+//        dialog.setTitle("Node Address Configuration");
+//        dialog.setContentText("Please Enter Node Address less 65535");
+//
+//        Optional<String> result = dialog.showAndWait();
+//        if (result.isPresent()){
+//            this.addNodeInList(TabPanel, result.get());
+//        }

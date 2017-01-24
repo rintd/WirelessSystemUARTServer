@@ -16,7 +16,7 @@
       </HBox>
       <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
          <children>
-            <TabPane fx:id="tab_panel" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+            <TabPane fx:id="tab_panel" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
               <tabs>
                 <!--<Tab text="Untitled Tab 1" />-->
                 <!--<Tab text="Untitled Tab 2" />-->
