@@ -8,9 +8,10 @@ import jssc.SerialPortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import static UART.UARTGateProtocolEnum.*;
 
 
 /**
@@ -23,14 +24,11 @@ public class UARTConnector {
     private SerialPort serialPort;
     private UARTConnectorDelegate delegate;
 
-    private byte[] bytesBuffer;
+    public boolean isDebug = false;
 
-    public UARTConnector(){
-        bytesBuffer = new byte[0];
-    }
+    public UARTConnector(){}
 
     public UARTConnector(UARTConnectorDelegate iDelegate){
-        bytesBuffer = new byte[0];
         delegate = iDelegate;
     }
 
@@ -77,6 +75,23 @@ public class UARTConnector {
         return true;
     }
 
+    public void SetNodeNewAddress(int address){
+
+        byte[] aByte = ByteBuffer.allocate(4).putInt(address).array();
+
+        byte[] bytes = {(byte)0xff, (byte)0x03 ,(byte)0x00, (byte)0x00, (byte)0x08, (byte)0x80, (byte)0x17,(byte)aByte[3],(byte)aByte[2]};
+
+        this.sendBytes(bytes);
+    }
+
+    public void GetNodeStatistic(int address){
+        byte[] aByte = ByteBuffer.allocate(4).putInt(address).array();
+
+        byte[] bytes = {(byte)0xff, (byte)1 ,(byte)0x00, (byte)0x00, aByte[3], aByte[2], (byte)0x0B,(byte)0x00};
+        this.sendBytes(bytes);
+    }
+
+
     private static final int RX_STAGE_WAIT_FOR_BEGIN = 0;
     private static final int RX_STAGE_READ_HEADER    = 1;
     private static final int RX_STAGE_READ_BODY      = 2;
@@ -88,19 +103,19 @@ public class UARTConnector {
     private int uart_state = RX_STAGE_WAIT_FOR_BEGIN;
 
     private UARTPackage uartPackage = null;
+
     private void processUARTData(byte[] data){
         //TODO:сделать обработку пакетов всех байт необработанных
 
-        byte [] tData = Arrays.copyOf(data,data.length);
+        System.out.println(data.length);
 
-        for (int i = 0; i < tData.length; i++) {
-            byte value = tData[i];
+        for (int i = 0; i < data.length; i++) {
+            byte value = data[i];
 
             switch (uart_state) {
                 case RX_STAGE_WAIT_FOR_BEGIN: {
-                    if (value == 0xFF) {
+                    if (value == (byte)0xFF) {
                         uartPackage = new UARTPackage();
-
                         uart_state = RX_STAGE_READ_HEADER;
                         sRX_headerDataSize = 0;
                         sRX_bodyDataSize = 0;
@@ -111,12 +126,13 @@ public class UARTConnector {
                     if (sRX_isEscapeMode == 1) {
                         sRX_isEscapeMode = 0;
                     } else {
-                        if (value == (char) 0xFE)//Escape byte
+                        if (value == (byte) 0xFE)//Escape byte
                         {
                             sRX_isEscapeMode = 1;
                             break;
-                        } else if (value == (char) 0xFF)//New message
+                        } else if (value == (byte) 0xFF)//New message
                         {
+                            uartPackage = new UARTPackage();
                             uart_state = RX_STAGE_READ_HEADER;
                             sRX_headerDataSize = 0;
                             sRX_bodyDataSize = 0;
@@ -139,7 +155,7 @@ public class UARTConnector {
 
                     sRX_headerDataSize++;
 
-                    if (sRX_headerDataSize == sRX_headerDataSize) {
+                    if (sRX_headerDataSize == 5) {
                         if (uartPackage.length > 0) {
                             uart_state = RX_STAGE_READ_BODY;
                             sRX_bodyDataSize = 0;
@@ -152,12 +168,13 @@ public class UARTConnector {
                     if (sRX_isEscapeMode == 1) {
                         sRX_isEscapeMode = 0;
                     } else {
-                        if (value == 0xFE)//Escape byte
+                        if (value == (byte) 0xFE)//Escape byte
                         {
                             sRX_isEscapeMode = 1;
                             break;
-                        } else if (value == 0xFF)//New message
+                        } else if (value == (byte) 0xFF)//New message
                         {
+                            uartPackage = new UARTPackage();
                             uart_state = RX_STAGE_READ_HEADER;
                             sRX_headerDataSize = 0;
                             sRX_bodyDataSize = 0;
@@ -168,11 +185,12 @@ public class UARTConnector {
 
                     if(sRX_bodyDataSize == 0) {
                         uartPackage.type = value & 0xFF;
-                        uartPackage.data = new byte[uartPackage.length - 6];
+                        uartPackage.data = new byte[uartPackage.length - 1];
                     } else {
                         uartPackage.data[sRX_bodyDataSize - 1] = value;
-                        sRX_bodyDataSize++;
                     }
+
+                    sRX_bodyDataSize++;
 
                     if (sRX_bodyDataSize == uartPackage.length) {
                         uart_state = RX_STAGE_WAIT_FOR_BEGIN;
@@ -183,14 +201,19 @@ public class UARTConnector {
                         if (delegate != null) {
                             delegate.OnConnectionDidRecivePackege(uartPackage);
                         }
-
-                        data = Arrays.copyOfRange(data,i,data.length);
                     }
                 } break;
             }
         }
+    }
 
-        data = new byte[0];
+    private void sendBytes(byte[]bytes){
+        try {
+            //TODO: лог отправленного пакета
+            serialPort.writeBytes(bytes);
+        } catch (SerialPortException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -199,15 +222,28 @@ public class UARTConnector {
         public void serialEvent(SerialPortEvent event) {
             if (event.isRXCHAR() && event.getEventValue() > 0) {
                 try {
-                    byte[] iBytes = serialPort.readBytes();
-                    byte[]tBuffer = new byte[UARTConnector.this.bytesBuffer.length + iBytes.length];
+                    byte[] c = serialPort.readBytes();
+                    byte[] iBytes = Arrays.copyOf(c,c.length);
 
-                    System.arraycopy(UARTConnector.this.bytesBuffer,0,tBuffer,0,UARTConnector.this.bytesBuffer.length);
-                    System.arraycopy(iBytes,0,tBuffer,UARTConnector.this.bytesBuffer.length,iBytes.length);
+                    if (UARTConnector.this.isDebug && delegate != null){
 
-                    UARTConnector.this.bytesBuffer = iBytes;
+                        String s = "";
+                        for (byte b : iBytes){
+                            s.concat(String.format("%02x",b & 0xFF));
+                        }
 
-                    UARTConnector.this.processUARTData(UARTConnector.this.bytesBuffer);
+                        delegate.OnDebugMessageRecived(s);
+                    }
+
+                    for (byte b : iBytes){
+                        System.out.printf("%02x",b & 0xFF);
+                    }
+                    System.out.println();
+
+                    if(iBytes.length>0){
+                        UARTConnector.this.processUARTData(iBytes);
+                    }
+
                 } catch (SerialPortException e) {
                     log.error("SerialPortException", e);
                 }

@@ -7,4 +7,6 @@ public interface UARTConnectorDelegate {
     public void OnConnectionClosed();
     public void OnConnectionOpened();
     public void OnConnectionDidRecivePackege(UARTPackage packege);
+
+    public void OnDebugMessageRecived(String message);
 }

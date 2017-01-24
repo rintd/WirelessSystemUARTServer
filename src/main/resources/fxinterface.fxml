@@ -12,6 +12,7 @@
          <children>
             <ChoiceBox id="uart_devices" maxWidth="1.7976931348623157E308" prefHeight="27.0" HBox.hgrow="ALWAYS" />
             <Button id="connect_button" mnemonicParsing="false" text="connect" />
+            <Button id="find_nodes" mnemonicParsing="false" text="updateNET" />
          </children>
       </HBox>
       <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
