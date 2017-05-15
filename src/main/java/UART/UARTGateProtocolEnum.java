@@ -43,4 +43,6 @@ public class UARTGateProtocolEnum {
 
     public static int PACKAGE_GET_ARROW_STATE_COUNT = 50;
     public static int PACKAGE_SET_ARROW_STATE       = 51;
+
+    public static int PACKAGE_ALARM                = 100;
 }

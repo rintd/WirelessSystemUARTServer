@@ -39,6 +39,8 @@ public class UARTConnector {
     }
 
     public boolean IsConnected(){
+        if (serialPort == null)
+            return false;
         return  serialPort.isOpened();
     }
 
@@ -75,11 +77,11 @@ public class UARTConnector {
         return true;
     }
 
-    public void SetNodeNewAddress(int address){
+    public void SetNodeNewAddress(int address) {
 
         byte[] aByte = ByteBuffer.allocate(4).putInt(address).array();
 
-        byte[] bytes = {(byte)0xff, (byte)0x03 ,(byte)0x00, (byte)0x00, (byte)0x08, (byte)0x80, (byte)0x17,(byte)aByte[3],(byte)aByte[2]};
+        byte[] bytes = {(byte) 0xff, (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x08, (byte) 0x80, (byte) 0x17, (byte) aByte[3], (byte) aByte[2]};
 
         this.sendBytes(bytes);
     }
@@ -88,6 +90,28 @@ public class UARTConnector {
         byte[] aByte = ByteBuffer.allocate(4).putInt(address).array();
 
         byte[] bytes = {(byte)0xff, (byte)1 ,(byte)0x00, (byte)0x00, aByte[3], aByte[2], (byte)0x0B,(byte)0x00};
+        this.sendBytes(bytes);
+    }
+
+
+    public void SetArrowDisable(int address){
+        byte[] aByte = ByteBuffer.allocate(4).putInt(address).array();
+
+        byte[] bytes = {(byte)0xff, (byte)2 ,(byte)0x00, (byte)0x00, aByte[3], aByte[2], (byte)51,(byte)0x00};
+        this.sendBytes(bytes);
+    }
+
+    public void SetArrowRight(int address){
+        byte[] aByte = ByteBuffer.allocate(4).putInt(address).array();
+
+        byte[] bytes = {(byte)0xff, (byte)2 ,(byte)0x00, (byte)0x00, aByte[3], aByte[2], (byte)51,(byte)0x01};
+        this.sendBytes(bytes);
+    }
+
+    public void SetArrowLeft(int address){
+        byte[] aByte = ByteBuffer.allocate(4).putInt(address).array();
+
+        byte[] bytes = {(byte)0xff, (byte)2 ,(byte)0x00, (byte)0x00, aByte[3], aByte[2], (byte)51,(byte)0x02};
         this.sendBytes(bytes);
     }
 

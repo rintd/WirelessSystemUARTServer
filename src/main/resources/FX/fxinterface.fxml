@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FX.JFxMainUIController">
@@ -21,10 +24,36 @@
             <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
          </VBox.margin>
       </HBox>
+      <HBox prefHeight="0.0" prefWidth="600.0">
+         <children>
+            <CheckBox fx:id="demoModeCheck" mnemonicParsing="false" text="Режим презентации" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="10.0" top="10.0" />
+               </HBox.margin>
+               <padding>
+                  <Insets right="20.0" />
+               </padding>
+            </CheckBox>
+            <Label  fx:id="netLog" prefHeight="38.0" prefWidth="397.0" text="Информация">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Label>
+         </children></HBox>
       <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
          <children>
             <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                <tabs>
+                  <Tab fx:id="plan" text="План здания">
+                  <content>
+                     <VBox fx:id="plan_canvas_box" alignment="TOP_CENTER" prefHeight="Infinity" prefWidth="Infinity">
+                        <Pane fx:id="canvas" minHeight="200.0" minWidth="200.0">
+                           <children>
+                              <Group fx:id="root" />
+                           </children>
+                        </Pane>
+                     </VBox>
+                  </content></Tab>
                   <Tab fx:id="nodesTab" text="Nodes">
                      <content>
                         <VBox fx:id="nodesTabContent" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">

@@ -24,7 +24,7 @@ public class JFxUIMain extends Application  {
         JFxMainUIController controller = loader.getController();
         controller.setUartConnector(uartConnector);
 
-        Scene scene = new Scene(vbox, 600, 480);
+        Scene scene = new Scene(vbox, 1280, 800);
 
         primaryStage.setTitle("RINTD Wireless System");
         primaryStage.setScene(scene);
