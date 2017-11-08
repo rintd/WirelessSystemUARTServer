@@ -131,7 +131,7 @@ public class UARTConnector {
     private void processUARTData(byte[] data){
         //TODO:сделать обработку пакетов всех байт необработанных
 
-        System.out.println(data.length);
+//        System.out.println(data.length);
 
         for (int i = 0; i < data.length; i++) {
             byte value = data[i];
@@ -249,20 +249,20 @@ public class UARTConnector {
                     byte[] c = serialPort.readBytes();
                     byte[] iBytes = Arrays.copyOf(c,c.length);
 
-                    if (UARTConnector.this.isDebug && delegate != null){
+//                    if (UARTConnector.this.isDebug && delegate != null){
+//
+//                        String s = "";
+//                        for (byte b : iBytes){
+//                            s.concat(String.format("%02x",b & 0xFF));
+//                        }
+//
+//                        delegate.OnDebugMessageRecived(s);
+//                    }
 
-                        String s = "";
-                        for (byte b : iBytes){
-                            s.concat(String.format("%02x",b & 0xFF));
-                        }
-
-                        delegate.OnDebugMessageRecived(s);
-                    }
-
-                    for (byte b : iBytes){
-                        System.out.printf("%02x",b & 0xFF);
-                    }
-                    System.out.println();
+//                    for (byte b : iBytes){
+//                        System.out.printf("%02x",b & 0xFF);
+//                    }
+//                    System.out.println();
 
                     if(iBytes.length>0){
                         UARTConnector.this.processUARTData(iBytes);

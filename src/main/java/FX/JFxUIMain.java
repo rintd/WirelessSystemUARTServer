@@ -2,10 +2,13 @@ package FX;
 
 import UART.UARTConnector;
 import javafx.application.Application;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * Created by Jiro on 23.01.17.
@@ -28,6 +31,12 @@ public class JFxUIMain extends Application  {
 
         primaryStage.setTitle("RINTD Wireless System");
         primaryStage.setScene(scene);
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                controller.stop();
+            }
+        });
         primaryStage.show();
     }
 
